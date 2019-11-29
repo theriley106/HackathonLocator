@@ -19,9 +19,18 @@ function getLocation() {
   }
 }
 
+
+function httpGet(theUrl)
+// The network request grabs the json containing mp3 structure
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
 function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude + 
-  "<br>Longitude: " + position.coords.longitude;
+  x.innerHTML = httpGet("/getByLongLat?lat=" + position.coords.latitude + "&long=" + position.coords.longitude);
 }
 </script>
 
