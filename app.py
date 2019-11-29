@@ -68,14 +68,14 @@ def pull_devpost():
 				ongoing = is_ongoing(dateRange[0].getText())
 				if ongoing == True:
 					hackathonURL = str(val).partition(' href="')[2].partition('"')[0]
-					toCheck.append(hackathonURL)
+					if len(hackathonURL) > 0:
+						toCheck.append(hackathonURL)
 				if ongoing == False and i == len(listOfHackathons) - 1:
 					return toCheck
-				# extract_datetime_from_date_range_string(dateRange[0].getText())
-				# raw_input()
 	return toCheck
 
 def get_nearby_hackathon(longitude, latitude):
+	for val in pull_devpost():
 	return
 
 @app.route('/getByLongLat', methods=['GET'])
