@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__, static_url_path='/static')
 
-url = "https://devpost.com/hackathons"
+url = "https://devpost.com/hackathons?page={0}"
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
@@ -37,7 +37,12 @@ def extract_datetime_from_date_range_string(dateRange):
 	if "-" in str(dateRange):
 		range1 = "{}, {}".format(dateRange.partition(" - ")[0], yearVal)
 		range1 = datetime.strptime(range1, '%b %d, %Y') - timedelta(days=1)
-		range2 = "{}, {}".format(dateRange.partition(" - ")[2].partition(",")[0], yearVal)
+		if len(dateRange.partition(" - ")[2].partition(",")[0]) < 3:
+			rangePart = dateRange.partition(" - ")[2].partition(",")[0]
+			rangePart = dateRange.partition(" - ")[0].partition(" ")[0] + " " + rangePart
+		else:
+			rangePart = dateRange.partition(" - ")[2].partition(",")[0]
+		range2 = "{}, {}".format(rangePart, yearVal)
 		range2 = datetime.strptime(range2, '%b %d, %Y') + timedelta(days=1)
 	else:
 		range1 = "{}, {}".format(dateRange.partition(",")[0], yearVal)
@@ -50,18 +55,25 @@ def is_ongoing(dateRange):
 	return is_time_between(a, b)
 
 def pull_devpost():
-	res = requests.get(url)
-	page = bs4.BeautifulSoup(res.text, 'lxml')
-	listOfHackathons = page.select(".clearfix")
+	toCheck = []
+	for page in [1,2,3]:
+		res = requests.get(url.format(page))
+		page = bs4.BeautifulSoup(res.text, 'lxml')
+		listOfHackathons = page.select(".clearfix")
 
-	for val in listOfHackathons:
-		dateRange = val.select(".date-range")
-		# This means there is a date range present
-		if len(dateRange) != 0:
-			print is_ongoing(dateRange[0].getText())
-			# extract_datetime_from_date_range_string(dateRange[0].getText())
-			# raw_input()
-	print page.title.string
+		for i, val in enumerate(listOfHackathons):
+			dateRange = val.select(".date-range")
+			# This means there is a date range present
+			if len(dateRange) != 0:
+				ongoing = is_ongoing(dateRange[0].getText())
+				if ongoing == True:
+					hackathonURL = str(val).partition(' href="')[2].partition('"')[0]
+					toCheck.append(hackathonURL)
+				if ongoing == False and i == len(listOfHackathons) - 1:
+					return toCheck
+				# extract_datetime_from_date_range_string(dateRange[0].getText())
+				# raw_input()
+	return toCheck
 
 def get_nearby_hackathon(longitude, latitude):
 	return
@@ -75,5 +87,5 @@ def pullFromLongLat():
 	return render_template("index1.html")
 
 if __name__ == '__main__':
-	pull_devpost()
+	print pull_devpost()
 	# app.run(host='127.0.0.1', port=5000)
