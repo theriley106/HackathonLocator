@@ -5,10 +5,25 @@ from flask import Flask, render_template, request, url_for, redirect, Markup, js
 import requests
 import bs4
 from datetime import datetime, timedelta
+import os
+try:
+	from keys import *
+except:
+	HERE_APP_ID = os.environ['HERE_APP_ID']
+	HERE_APP_CODE = os.environ['HERE_APP_CODE']
+
+HERE_URL = "https://geocoder.api.here.com/6.2/geocode.json?searchtext={0}&gen=9&app_id={1}&app_code={2}"
 
 app = Flask(__name__, static_url_path='/static')
 
 url = "https://devpost.com/hackathons?page={0}"
+
+def gen_geocode_url(address):
+	return HERE_URL.format(address, HERE_APP_ID, HERE_APP_CODE)
+
+def get_url(url):
+	res = requests.get(url)
+	return res.text
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
@@ -53,6 +68,10 @@ def extract_datetime_from_date_range_string(dateRange):
 def is_ongoing(dateRange):
 	a, b = extract_datetime_from_date_range_string(dateRange)
 	return is_time_between(a, b)
+
+def get_address_from_hackathon(hackathonURL):
+	get_url(hackathonURL)
+
 
 def pull_devpost():
 	toCheck = []
