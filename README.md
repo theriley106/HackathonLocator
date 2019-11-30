@@ -31,7 +31,7 @@ Response:
 ]
 ```
 
-**Note: ** *distance* refers to the [Haversine Distance](https://en.wikipedia.org/wiki/Haversine_formula) between your current longitude/latitude and the reported location of the hackathon.
+Note: *distance* refers to the [Haversine Distance](https://en.wikipedia.org/wiki/Haversine_formula) between your current longitude/latitude and the reported location of the hackathon.
 
 ### ?expand=False
 
