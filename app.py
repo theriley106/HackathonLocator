@@ -138,14 +138,17 @@ def get_nearby_hackathon(longitude, latitude):
 def pullFromLongLat():
 	longitude = request.args.get('long', None)
 	latitude = request.args.get('lat', None)
+	expand = str(request.args.get("expand", False)).lower() == 'true'
 	print longitude
 	print latitude
 	if latitude == None or longitude == None:
 		return "None"
 	longitude = round(float(longitude), 7)
 	latitude = round(float(latitude), 7)
-	return get_nearby_hackathon(longitude, latitude)[0]['title']
-	# return render_template("index1.html")
+	nearby = get_nearby_hackathon(longitude, latitude)
+	if expand == True:
+		return jsonify(nearby)
+	return nearby[0]['title']
 
 if __name__ == '__main__':
 	#print pull_devpost()
